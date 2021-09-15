@@ -66,7 +66,6 @@ void WiFiEvent(WiFiEvent_t event)
 void wifi_task_callback(void) {
   if(WIFI_task.isFirstIteration()) {
     ftpSrv.begin("admin",WiFiSettings.password.c_str());
-    print_DEBUG(WiFiSettings.password.c_str());
   }
 
   if (WiFi.status() != WL_CONNECTED) {

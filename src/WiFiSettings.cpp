@@ -353,6 +353,7 @@ bool WiFiSettingsClass::connect(bool portal, int wait_seconds) {
     unsigned long starttime = millis();
     while (WiFi.status() != WL_CONNECTED && (wait_seconds < 0 || (millis() - starttime) < wait_seconds * (uint)1000)) {
         Serial.print(".");
+        yield();
         delay(onWaitLoop ? onWaitLoop() : 100);
     }
 
