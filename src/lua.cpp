@@ -3,50 +3,12 @@
 #include <FS.h>
 
 Task LUA_task(1000, TASK_FOREVER, &lua_task_callback);
-
+String lua_func;
 String lua_code;
 size_t  lua_code_len;
 
 lua_State *LUA_state;       // VM lua
 bool lua_st;                // статус ВМ
-
-static int lua_wrapper_print(lua_State *L) {
-    int n = lua_gettop(L);  /* number of arguments */
-    int i;
-    String msg = "";
-    lua_getglobal(L, "tostring");
-    for (i=1; i<=n; i++) {
-        const char *s;
-        size_t l;
-        lua_pushvalue(L, -1);  /* function to be called */
-        lua_pushvalue(L, i);   /* value to print */
-        lua_call(L, 1, 1);
-        s = lua_tolstring(L, -1, &l);  /* get result */
-        if (s == NULL) return luaL_error(L, "'tostring' must return a string to 'print'");
-        msg += String(s);
-        lua_pop(L, 1);  /* pop result */
-    }
-    print_DEBUG(msg);
-    return 0;
-}
-
-static int lua_wrapper_putnvr(lua_State *lua_state) {
-    const char *key;
-    const char *value;
-    key   = lua_tostring(lua_state,1);
-    value = lua_tostring(lua_state,2);
-    spurt(key,value);
-    return 0;
-}
-static int lua_wrapper_readnvr(lua_State *lua_state) {
-    const char *key;
-    String ret;
-    key   = lua_tostring(lua_state,1);
-    ret = slurp(key);
-    //print_DEBUG(ret);
-    lua_pushstring(lua_state,ret.c_str());
-    return 1;
-}
 
 void lua_put_global_param(lua_State *lua_state) {
     lua_pushstring(LUA_state,WiFiSettings.hostname.c_str());lua_setglobal(LUA_state, "wifi_hostname"); // set hostname
@@ -101,17 +63,17 @@ return true;
 
 void init_lua(Scheduler *sc) {
 print_DEBUG("Init LUA ...");
-u_int ret;
+u_int lua_run_time; // Переодичность выполнения lua скрипта
 lua_code_len = 0;
 LUA_state = luaL_newstate();
 luaopen_base(LUA_state);
 luaopen_table(LUA_state);
 luaopen_string(LUA_state);
 luaopen_math(LUA_state);
-lua_register(LUA_state, "print",     (const lua_CFunction)  &lua_wrapper_print);
-lua_register(LUA_state, "save_nvram",(const lua_CFunction)  &lua_wrapper_putnvr);
-lua_register(LUA_state, "read_nvram",(const lua_CFunction)  &lua_wrapper_readnvr);
-ret = 1000;
+luaopen_libesp32(LUA_state);
+
+
+lua_run_time = 1000;
 
 if(load_lua_code("/start.lua") == true) {
     lua_st = luaL_loadbuffer(LUA_state,lua_code.c_str(),lua_code.length(),"ESP32-POW");
@@ -121,12 +83,13 @@ if(load_lua_code("/start.lua") == true) {
         const char* err = lua_tostring(LUA_state, -1);
         print_DEBUG(err);
     } else {
-        ret = lua_tonumber(LUA_state, -1);
-        lua_pop(LUA_state,1);
-        lua_pop(LUA_state, lua_gettop(LUA_state));
+        lua_run_time = lua_tonumber(LUA_state,-1);
+        lua_pop(LUA_state,-1);
+        Serial.print("Time interval: ");
+        Serial.println(lua_run_time);
         lua_code="";
         sc->addTask(LUA_task);
-        LUA_task.setInterval(ret);
+        LUA_task.setInterval(lua_run_time);
         LUA_task.enable();
     }
 

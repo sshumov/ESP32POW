@@ -5,4 +5,7 @@
 #include <TaskSchedulerDeclarations.h>
 void lua_task_callback(void);
 void init_lua(Scheduler *sc);
+extern lua_State *LUA_state;       // VM lua
+
+void luaopen_libesp32(lua_State* L);
 #endif
