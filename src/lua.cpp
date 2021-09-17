@@ -71,8 +71,6 @@ luaopen_table(LUA_state);
 luaopen_string(LUA_state);
 luaopen_math(LUA_state);
 luaopen_libesp32(LUA_state);
-
-
 lua_run_time = 1000;
 
 if(load_lua_code("/start.lua") == true) {
