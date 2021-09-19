@@ -47,6 +47,7 @@ void lua_task_callback() {
 bool load_lua_code(const char *file_r) {
 File f;
 f = SPIFFS.open(file_r, "r");
+
 if(!f) {
     print_DEBUG("load_lua_code unable to open file: /start.lua");
     return false;
@@ -66,10 +67,13 @@ print_DEBUG("Init LUA ...");
 u_int lua_run_time; // Переодичность выполнения lua скрипта
 lua_code_len = 0;
 LUA_state = luaL_newstate();
-luaopen_base(LUA_state);
-luaopen_table(LUA_state);
-luaopen_string(LUA_state);
-luaopen_math(LUA_state);
+//luaopen_base(LUA_state);
+//luaopen_table(LUA_state);
+//luaopen_string(LUA_state);
+//luaopen_math(LUA_state);
+//luaL_requiref(LUA_state, "io", luaopen_io, 1);
+luaL_openlibs(LUA_state);
+
 luaopen_libesp32(LUA_state);
 lua_run_time = 1000;
 

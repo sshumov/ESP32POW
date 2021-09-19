@@ -7,8 +7,19 @@
 #include "WiFiSettings.h"
 #include <Wire.h>
 #include "DS3231.h"
-#include "SPIFFS.h"
 
+
+#define USE_LittleFS
+
+#ifdef USE_LittleFS
+  #define SPIFFS LITTLEFS
+  #include <LITTLEFS.h> 
+#else
+  #include <SPIFFS.h>
+#endif 
+
+
+#include <FS.h>
 #include <TaskSchedulerDeclarations.h>
 #include <Preferences.h>
 
@@ -63,3 +74,4 @@ extern DateTime DTM;
 void print_DEBUG(String msg);
 String slurp(const String& fn);
 void spurt(const String& fn, const String& content);
+int system(const char *cmd);

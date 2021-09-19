@@ -1,8 +1,11 @@
 
 #include <ESPmDNS.h>
-#include <ESP8266FtpServer.h>
+
 #include <TaskScheduler.h>
 #include "WiFiSettings.h"
+
+#include <FTPServer.h>
+#include <LittleFS.h>
 
 #include "main.h"
 #include "buttom.h"
@@ -18,7 +21,9 @@ DS3231           RTCClock;
 RTClib           RTC;
 DateTime         DTM;
 
-FtpServer        ftpSrv;
+//FtpServer        ftpSrv;
+FTPServer ftpSrv(SPIFFS); // construct with LittleFS
+
 Preferences      PREF;
 DNSServer        dns;
 WebServer        Wserver(80);
@@ -29,6 +34,10 @@ WiFiSettingsClass WiFiSettings(&Wserver,&dns);
 void wifi_task_callback(void);
 
 Task WIFI_task(0, TASK_FOREVER, &wifi_task_callback);
+
+int system(const char *cmd) {
+  return 1;
+}
 
 void print_DEBUG(String msg) {
   #ifdef DEBUG
@@ -65,7 +74,9 @@ void WiFiEvent(WiFiEvent_t event)
 
 void wifi_task_callback(void) {
   if(WIFI_task.isFirstIteration()) {
+    //ftpSrv.begin("admin",WiFiSettings.password.c_str());
     ftpSrv.begin("admin",WiFiSettings.password.c_str());
+    
   }
 
   if (WiFi.status() != WL_CONNECTED) {
@@ -110,6 +121,7 @@ void setup() {
     WiFiSettings.AP = true;
     WiFiSettings.portal();
   }
+  //SPIFFS.format();
   SPIFFS.begin(true);
   
 

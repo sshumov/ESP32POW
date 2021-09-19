@@ -3,15 +3,29 @@ function tick()
 --   print ( 'Hostname: ' .. wifi_hostname .. " wifi status " .. tostring(wifi_status) )
 --   print ( '.' )
 end
+-- not pass
+
 
 local ssid = read_nvram("/wifi-ssid")
 local pwd  = read_nvram("/wifi-password")
 print ('Version: ' .. _VERSION )
 print ( 'Hostname: ' .. wifi_hostname .. " wifi status " .. tostring(wifi_status) .. ' SSID: ' .. ssid .. " wifi password: " .. pwd )
 
+-- package.path = "/littlefs/package"
+local h = require("package/hello.lua")
+h.welcome("Petya") -- local "h"
+
+-- pass
+-- fp = io.open('/littlefs/test.txt','r') 
+-- print(fp:read())
+-- fp:close()
+
+-- pass
 --  save_nvram('testram','12569')
 --  local tread = read_nvram("testram")
 --  print ("Test ram read: " .. tread )
+
+-- pass
 -- dofile('/spiffs/t.lua')
 
 -- return interval run script
