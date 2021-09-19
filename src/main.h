@@ -70,7 +70,7 @@ extern bool wifi_status;
 extern DS3231 RTCClock;
 extern RTClib RTC;
 extern DateTime DTM;
-
+void mem_stat(void);
 void print_DEBUG(String msg);
 String slurp(const String& fn);
 void spurt(const String& fn, const String& content);

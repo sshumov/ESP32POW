@@ -14,10 +14,25 @@ void lua_put_global_param(lua_State *lua_state) {
     lua_pushstring(LUA_state,WiFiSettings.hostname.c_str());lua_setglobal(LUA_state, "wifi_hostname"); // set hostname
     lua_pushboolean(LUA_state,wifi_status);lua_setglobal(LUA_state, "wifi_status"); // set wifi status
 }
+void lua_gcollector(void) {
+    uint used_lua_memory;
+    used_lua_memory = lua_gc(LUA_state, LUA_GCCOUNT, 0);
+
+    if(used_lua_memory > 64 )  {
+        #ifdef DEBUG
+            print_DEBUG("LUA: START gcollector");
+            mem_stat();
+        #endif
+        lua_gc (LUA_state, LUA_GCCOLLECT, 0);
+        #ifdef DEBUG
+            print_DEBUG("LUA: END gcollector");
+            mem_stat();
+        #endif
+    }
+}
 
 void lua_task_callback() {
     String func = "tick";
-    uint used_lua_memory;
     lua_put_global_param(LUA_state);
     lua_getglobal(LUA_state, func.c_str());
         if (lua_isfunction(LUA_state, -1)) {
@@ -35,13 +50,7 @@ void lua_task_callback() {
                 print_DEBUG("LUA: function " + func + " not define in lua script");
             #endif
         }
-    used_lua_memory = lua_gc(LUA_state, LUA_GCCOUNT, 0);
-    if(used_lua_memory > 64 )  {
-        lua_gc (LUA_state, LUA_GCCOLLECT, 0);
-        #ifdef DEBUG
-                print_DEBUG("LUA: run gcollector");
-        #endif
-    }
+        lua_gcollector();
 }
 
 bool load_lua_code(const char *file_r) {
@@ -67,12 +76,13 @@ print_DEBUG("Init LUA ...");
 u_int lua_run_time; // Переодичность выполнения lua скрипта
 lua_code_len = 0;
 LUA_state = luaL_newstate();
-//luaopen_base(LUA_state);
-//luaopen_table(LUA_state);
-//luaopen_string(LUA_state);
-//luaopen_math(LUA_state);
-//luaL_requiref(LUA_state, "io", luaopen_io, 1);
 luaL_openlibs(LUA_state);
+
+#ifdef USE_NTP
+    init_ntp(LUA_state);
+#endif
+//luaL_requiref(LUA_state, "io", luaopen_io, 1);
+
 
 luaopen_libesp32(LUA_state);
 lua_run_time = 1000;
@@ -94,7 +104,7 @@ if(load_lua_code("/start.lua") == true) {
         LUA_task.setInterval(lua_run_time);
         LUA_task.enable();
     }
-
+    lua_gcollector();
 } else {
     print_DEBUG("Unable load lua script");
 }

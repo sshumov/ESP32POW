@@ -8,6 +8,9 @@ void lua_task_callback(void);
 void init_lua(Scheduler *sc);
 extern lua_State *LUA_state;       // VM lua
 
+#ifdef USE_NTP
+void init_ntp(lua_State* L);
+#endif
 
 void luaopen_libesp32(lua_State* L);
 #endif

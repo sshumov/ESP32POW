@@ -8,17 +8,18 @@ end
 
 local ssid = read_nvram("/wifi-ssid")
 local pwd  = read_nvram("/wifi-password")
-print ('Version: ' .. _VERSION )
-print ( 'Hostname: ' .. wifi_hostname .. " wifi status " .. tostring(wifi_status) .. ' SSID: ' .. ssid .. " wifi password: " .. pwd )
 
--- package.path = "/littlefs/package"
-local h = require("package/hello.lua")
+print ('LUA version: ' .. _VERSION )
+
+print ( 'Hostname: ' .. wifi_hostname .. " wifi status: " .. tostring(wifi_status) .. ' SSID: ' .. ssid .. " wifi password: " .. pwd )
+
+local h = require("hello")
 h.welcome("Petya") -- local "h"
 
 -- pass
--- fp = io.open('/littlefs/test.txt','r') 
--- print(fp:read())
--- fp:close()
+fp = io.open('/littlefs/test.txt','r') 
+print(fp:read())
+fp:close()
 
 -- pass
 --  save_nvram('testram','12569')
