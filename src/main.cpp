@@ -15,11 +15,6 @@
 #include "ota.h"
 #endif
 
-#ifdef USE_DS3231
-#include "ds3231.hpp"
-#endif
-
-
 Scheduler        SCHEDULER;                  // Системный шедулер
 
 //FtpServer        ftpSrv;
@@ -82,12 +77,12 @@ void WiFiEvent(WiFiEvent_t event)
       wifi_status = false;
       yield();
       WiFi.reconnect();
-      digitalWrite(LED_GREEN,HIGH);
+      //digitalWrite(LED_GREEN,HIGH);
       break;
     case SYSTEM_EVENT_STA_GOT_IP:
       print_DEBUG("Obtained IP address: ");
       wifi_status = true;
-      digitalWrite(LED_BLUE,LOW);
+      //digitalWrite(LED_BLUE,LOW);
       break;
     default: break;
     }
@@ -134,7 +129,7 @@ void setup() {
   if(safe_mode == true ) {
     print_DEBUG("ENTER SAFE MODE");
     PREF.putBool("safe_mode",false);
-    digitalWrite(LED_RED,HIGH);
+    //digitalWrite(LED_RED,HIGH);
     WiFiSettings.AP = true;
     WiFiSettings.portal();
   }

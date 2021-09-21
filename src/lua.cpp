@@ -2,6 +2,17 @@
 #include "lua.h"
 #include <FS.h>
 
+#ifdef USE_DS3231
+#include "ds3231.hpp"
+#endif
+
+#ifdef USE_TOP323
+#include "top323.h"
+#endif
+
+
+
+
 Task LUA_task(1000, TASK_FOREVER, &lua_task_callback);
 String lua_func;
 String lua_code;
@@ -78,12 +89,20 @@ lua_code_len = 0;
 LUA_state = luaL_newstate();
 
 luaL_openlibs(LUA_state);
+luaopen_libesp32(LUA_state);
 
-#ifdef USE_DS3231
-    init_ds3231(LUA_state);
+#ifdef USE_TOP323
+init_top323(LUA_state);
 #endif
 
-luaopen_libesp32(LUA_state);
+#ifdef USE_DS3231
+init_ds3231(LUA_state);
+#endif
+
+
+
+
+
 lua_run_time = 1000;
 
 if(load_lua_code("/start.lua") == true) {

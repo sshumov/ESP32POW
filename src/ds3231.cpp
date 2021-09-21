@@ -3,8 +3,8 @@
 #include "lua.h"
 
 
-DS3231 RTCClock;
-RTClib RTC;
+static DS3231 RTCClock;
+static RTClib RTC;
 
 static int ds3231_get(lua_State *L) {
     DateTime now = RTC.now();

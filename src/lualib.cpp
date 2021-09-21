@@ -1,8 +1,6 @@
 #include "main.h"
 #include "lua.h"
 
-static char const VERSION[] = "0.1.0";
-
 static int lua_print(lua_State *L) {
     int n = lua_gettop(L);  /* number of arguments */
     int i;
