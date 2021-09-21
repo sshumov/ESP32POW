@@ -42,9 +42,7 @@
 #define     R6                    13
 #define     CP                    27             // Номер GPIO ESP32 використовуємий для зміни стану реле (тригер)
 #define     CS_1                  05
-#define     BUTTON_PIN            0              // Номер GPIO ESP32 використовуємий для кнопки
-#define     DELAY_BUTTON_ACTION1  80             // Затримка нажатої кномки для виконання дії 1 зазначено у мс
-#define     DELAY_BUTTON_ACTION2  5000           // Затримка нажатої кномки для виконання дії 2 зазначено у мс
+
 #define     READ                  0b00000001     //This value tells  that data is to be read from the requested register.
 #define     WRITE                 0b00000000     //This value tells  that data is to be written to the requested register.
 
@@ -67,9 +65,6 @@ extern WebServer        Wserver;
 // WIFI status
 extern bool wifi_status;
 
-extern DS3231 RTCClock;
-extern RTClib RTC;
-extern DateTime DTM;
 void mem_stat(void);
 void print_DEBUG(String msg);
 String slurp(const String& fn);

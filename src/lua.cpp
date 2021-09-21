@@ -76,13 +76,12 @@ print_DEBUG("Init LUA ...");
 u_int lua_run_time; // Переодичность выполнения lua скрипта
 lua_code_len = 0;
 LUA_state = luaL_newstate();
+
 luaL_openlibs(LUA_state);
 
-#ifdef USE_NTP
-    init_ntp(LUA_state);
+#ifdef USE_DS3231
+    init_ds3231(LUA_state);
 #endif
-//luaL_requiref(LUA_state, "io", luaopen_io, 1);
-
 
 luaopen_libesp32(LUA_state);
 lua_run_time = 1000;

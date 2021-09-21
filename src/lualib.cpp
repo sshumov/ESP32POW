@@ -1,16 +1,6 @@
 #include "main.h"
 #include "lua.h"
 
-#ifdef USE_NTP
-#include "WiFiUdp.h"
-#include "NTP.h"
-#endif
-
-#ifdef USE_NTP
-WiFiUDP wifiUdp;
-NTP ntp(wifiUdp);
-#endif
-
 static char const VERSION[] = "0.1.0";
 
 static int lua_print(lua_State *L) {
@@ -56,38 +46,3 @@ lua_register(LUA_state, "print",     (const lua_CFunction)  &lua_print);
 lua_register(LUA_state, "save_nvram",(const lua_CFunction)  &lua_putnvr);
 lua_register(LUA_state, "read_nvram",(const lua_CFunction)  &lua_readnvr);
 }
-
-#ifdef USE_NTP
-
-static int ntp_ruleDST (lua_State *L) {
-    return 1;
-}
-
-static int ntp_ruleSTD (lua_State *L) {
-    return 1;
-}
-
-static int ntp_begin (lua_State *L) {
-    print_DEBUG("Start NTP module");
-    return 0;
-}
-
-static const luaL_Reg ntplib[] = {
-    {"ruleDST", ntp_ruleDST},
-    {"ruleSTD", ntp_ruleSTD},
-    {"begin",   ntp_begin},
-    {NULL, NULL}
-};
-
-
-LUAMOD_API int luaopen_ntp (lua_State *L) {
-  luaL_newlib(L, ntplib);
-  return 1;
-}
-
-void init_ntp(lua_State *L) {
-    luaL_requiref(L, "ntp", luaopen_ntp, 1);
-    //lua_pop(L, 1);
-}
-
-#endif

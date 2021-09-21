@@ -12,5 +12,9 @@ extern lua_State *LUA_state;       // VM lua
 void init_ntp(lua_State* L);
 #endif
 
+#ifdef USE_DS3231
+void init_ds3231(lua_State* L);
+#endif
+
 void luaopen_libesp32(lua_State* L);
 #endif

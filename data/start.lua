@@ -2,9 +2,10 @@ function tick()
 --   print ( "hostname: " .. wifi_hostname .. " wifi status: " .. wifi_status )
 --   print ( 'Hostname: ' .. wifi_hostname .. " wifi status " .. tostring(wifi_status) )
 --   print ( '.' )
-end
--- not pass
 
+ --    local err,d_h,d_m,d_s,d_y,d_mn,d_d,dw = ntp.sync(2.0,1)
+ --     print ( 'Date: ' .. d_y .. '-' .. d_mn .. '-' .. d_d .. ' ' .. d_h .. ':' .. d_m .. ':' .. d_s .. '---')
+end
 
 local ssid = read_nvram("/wifi-ssid")
 local pwd  = read_nvram("/wifi-password")
@@ -13,13 +14,19 @@ print ('LUA version: ' .. _VERSION )
 
 print ( 'Hostname: ' .. wifi_hostname .. " wifi status: " .. tostring(wifi_status) .. ' SSID: ' .. ssid .. " wifi password: " .. pwd )
 
-local h = require("hello")
-h.welcome("Petya") -- local "h"
+-- pass
+-- local h = require("hello")
+-- h.welcome("Petya") -- local "h"
 
 -- pass
-fp = io.open('/littlefs/test.txt','r') 
-print(fp:read())
-fp:close()
+-- fp = io.open('/littlefs/test.txt','r') 
+-- print(fp:read())
+-- fp:close()
+
+-- pass
+-- local t = require "ntp"
+-- t.begin()
+-- ntp.begin()
 
 -- pass
 --  save_nvram('testram','12569')
@@ -27,7 +34,9 @@ fp:close()
 --  print ("Test ram read: " .. tread )
 
 -- pass
--- dofile('/spiffs/t.lua')
+-- dofile('/littlefs/file.lua')
 
 -- return interval run script
-return 1000
+ntp.begin()
+
+return 5000

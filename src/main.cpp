@@ -15,11 +15,12 @@
 #include "ota.h"
 #endif
 
-Scheduler        SCHEDULER;                  // Системный шедулер
+#ifdef USE_DS3231
+#include "ds3231.hpp"
+#endif
 
-DS3231           RTCClock;
-RTClib           RTC;
-DateTime         DTM;
+
+Scheduler        SCHEDULER;                  // Системный шедулер
 
 //FtpServer        ftpSrv;
 FTPServer ftpSrv(SPIFFS); // construct with LittleFS
@@ -137,13 +138,17 @@ void setup() {
     WiFiSettings.AP = true;
     WiFiSettings.portal();
   }
-  //SPIFFS.format();
+  Wire.begin();
   SPIFFS.begin(true);
   
 
   SCHEDULER.init();
   init_buttom(&SCHEDULER);
   init_wifi(&SCHEDULER);
+  #ifdef USE_OTA
+    init_ota(&SCHEDULER);
+  #endif
+
   init_lua(&SCHEDULER);
 }
 
