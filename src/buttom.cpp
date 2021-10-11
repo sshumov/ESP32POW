@@ -1,7 +1,10 @@
 #include "main.h"
 #include "buttom.h"
+#include "console.h"
+#include "led.h"
+#define BUTTOM_LED LED_RED
 
-Task BUTTOM_task(0, TASK_FOREVER, &buttom_task_callback);
+Task BUTTOM_task(10, TASK_FOREVER, &buttom_task_callback);
 
 uint32_t  timeButtonDown;
 uint8_t   xPressButton_action;
@@ -22,22 +25,22 @@ static u_long releasedTime = 0;
 void buttom_task_callback() {
   currentState = digitalRead(BUTTON_PIN);
   if(lastState == HIGH && currentState == LOW)        // button is pressed
-    pressedTime = millis();
+    { pressedTime = millis();}
   else if(lastState == LOW && currentState == HIGH) { // button is released
-    releasedTime = millis();
+    { releasedTime = millis();}
 
   long pressDuration = releasedTime - pressedTime;
   
   if(pressDuration > LONG_PRESS_TIME ) {
   // Enter safe mode
-    print_DEBUG("press long");
+    debugI("* BUTTOM: press long long");
     PREF.putBool("safe_mode",true);
     yield();
     ESP.restart();
   }
 
   if(pressDuration > SHORT_PRESS_TIME && pressDuration < LONG_PRESS_TIME ) {
-    print_DEBUG("Long press");
+    debugI("* BUTTOM: press long");
   }
 
   if( pressDuration < SHORT_PRESS_TIME ) {
@@ -58,7 +61,6 @@ void init_buttom(Scheduler *sc) {
   #endif
   pinMode(BUTTON_PIN, INPUT);
   lastState = digitalRead(BUTTON_PIN);
-
   sc->addTask(BUTTOM_task);
   BUTTOM_task.enable();
 }

@@ -79,16 +79,17 @@ static int top323_get(lua_State *L) {
     uint32_t vrmsa,vrmsb,vrmsc;
     uint32_t irmsa,irmsb,irmsc;
     uint32_t apowera,apowerb,apowerc;
+    uint16_t th1,th2,th3;
     vrmsa = read_32(AVRMS);vrmsb = read_32(BVRMS);vrmsc = read_32(CVRMS);
     irmsa = read_32(AIRMS);irmsb = read_32(BIRMS);irmsc = read_32(CIRMS);
     apowera = read_32(AWATT);apowerb = read_32(BWATT);apowerc = read_32(CWATT);
+    th1=analogRead(TH1);th2=analogRead(TH2);th3=analogRead(TH3);
     lua_pushinteger(L,vrmsa);lua_pushinteger(L,vrmsb);lua_pushinteger(L,vrmsc);
     lua_pushinteger(L,irmsa);lua_pushinteger(L,irmsb);lua_pushinteger(L,irmsc);
     lua_pushinteger(L,apowera);lua_pushinteger(L,apowerb);lua_pushinteger(L,apowerc);
-    return 9;
+    lua_pushinteger(L,th1);lua_pushinteger(L,th2);lua_pushinteger(L,th3);
+    return 12;
 }
-
-
 
 inline float getVrmsA(){  
   
@@ -170,12 +171,14 @@ void ADCInit(){
 }
 
 static int top323_init(lua_State *L) {
+    print_DEBUG("POW module");
     ADCInit();
     return 0;
 }
 
 static int top323_RelayOn(lua_State *L){
   uint number = luaL_checkinteger(L,1);
+  Serial.print("Relay: ");Serial.print(number);Serial.println(" ON");
   digitalWrite(CP, LOW);delayMicroseconds(100);
   digitalWrite(number, HIGH);delayMicroseconds(100);
   digitalWrite(CP, HIGH);
@@ -184,6 +187,7 @@ static int top323_RelayOn(lua_State *L){
 
 static int top323_RelayOff(lua_State *L){
   uint number = luaL_checkinteger(L,1);
+  Serial.print("Relay: ");Serial.print(number);Serial.println(" OFF");
   digitalWrite(CP, LOW);  delayMicroseconds(100);
   digitalWrite(number, LOW);delayMicroseconds(100);
   digitalWrite(CP, HIGH);delayMicroseconds(100);
@@ -195,7 +199,7 @@ static int top323_RelayOff(lua_State *L){
 static const luaL_Reg top323lib[] = {
     {"init", top323_init},
     {"get", top323_get},
-    {"relayOm", top323_RelayOn},
+    {"relayOn", top323_RelayOn},
     {"relayOff", top323_RelayOff},
     {NULL, NULL}
 };
@@ -207,6 +211,15 @@ LUAMOD_API int luaopen_top323 (lua_State *L) {
 }
 
 void init_top323(lua_State *L) {
+    pinMode(TH1, INPUT);pinMode(TH2, INPUT);pinMode(TH3, INPUT);
+
+    pinMode(R1, OUTPUT);pinMode(R2, OUTPUT);
+    pinMode(R3, OUTPUT);pinMode(R4, OUTPUT);
+    pinMode(R5, OUTPUT);pinMode(R6, OUTPUT);pinMode(CP, OUTPUT);
+    digitalWrite(R1, LOW);digitalWrite(R2, LOW);
+    digitalWrite(R3, LOW);digitalWrite(R4, LOW);
+    digitalWrite(R5, LOW);digitalWrite(R6, LOW);digitalWrite(CP, LOW);
+
     luaL_requiref(L, "top323", luaopen_top323, 1);
     lua_pop(L, 1);
 }

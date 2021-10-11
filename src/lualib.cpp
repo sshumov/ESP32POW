@@ -1,6 +1,6 @@
 #include "main.h"
 #include "lua.h"
-
+#include "console.h"
 static int lua_print(lua_State *L) {
     int n = lua_gettop(L);  /* number of arguments */
     int i;
@@ -17,7 +17,7 @@ static int lua_print(lua_State *L) {
         msg += String(s);
         lua_pop(L, 1);  /* pop result */
     }
-    print_DEBUG(msg);
+    debugI("LUA: print: %s",msg);
     return 0;
 }
 static int lua_putnvr(lua_State *lua_state) {

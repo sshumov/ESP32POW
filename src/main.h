@@ -6,6 +6,7 @@
 #include <WiFiClient.h>
 #include "WiFiSettings.h"
 #include <Wire.h>
+#include <ESPmDNS.h>
 
 #include "lua.h"
 

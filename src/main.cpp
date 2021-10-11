@@ -1,6 +1,4 @@
 
-#include <ESPmDNS.h>
-
 #include <TaskScheduler.h>
 #include "WiFiSettings.h"
 
@@ -8,11 +6,18 @@
 #include <LittleFS.h>
 
 #include "main.h"
+#include "led.h"
+
 #include "buttom.h"
 #include "lua.h"
+#include "console.h"
 
 #ifdef  USE_OTA
 #include "ota.h"
+#endif
+
+#ifdef USE_TOP323
+#include "top323.h"
 #endif
 
 Scheduler        SCHEDULER;                  // Системный шедулер
@@ -50,16 +55,14 @@ void mem_stat(void) {
   // allocated_blocks;      ///<  Number of (variable size) blocks allocated in the heap.
   // free_blocks;           ///<  Number of (variable size) free blocks in the heap.
   // total_blocks;          ///<  Total number of (variable size) blocks in the heap.
-  multi_heap_info_t info;
-  uint32_t free;uint16_t max;uint8_t frag;
-  heap_caps_get_info(&info, MALLOC_CAP_INTERNAL);
-  free = info.total_free_bytes;
-  max  = info.largest_free_block;
-  frag = 100 - (max * 100) / free;
-  #ifdef DEBUG
-    DBG_OUTPUT_PORT.printf("[MEM] free: %5d | max: %5d | frag: %3d%% \n", free, max, frag);
-  #endif
-}
+    multi_heap_info_t info;
+    uint32_t free;uint16_t max;uint8_t frag;
+    heap_caps_get_info(&info, MALLOC_CAP_INTERNAL);
+    free = info.total_free_bytes;
+    max  = info.largest_free_block;
+    frag = 100 - (max * 100) / free;
+    debugI("[MEM] free: %5d | max: %5d | frag: %3d%% \n", free, max, frag);
+  }
 
 String slurp(const String& fn) {
   return PREF.getString(fn.c_str());
@@ -116,9 +119,6 @@ void init_wifi(Scheduler *sc) {
 
 }
 
-
-
-
 void setup() {
   
   DBG_OUTPUT_PORT.begin(115200);
@@ -134,17 +134,32 @@ void setup() {
     WiFiSettings.portal();
   }
   Wire.begin();
-  SPIFFS.begin(true);
-  
+ SPIFFS.begin(true);
+ pinMode(LED_GREEN, OUTPUT);pinMode(LED_RED, OUTPUT);pinMode(LED_BLUE, OUTPUT);
+
+  pinMode(R1, OUTPUT);pinMode(R2, OUTPUT);
+  pinMode(R3, OUTPUT);pinMode(R4, OUTPUT);
+  pinMode(R5, OUTPUT);pinMode(R6, OUTPUT);pinMode(CP, OUTPUT);
+
+  // Вхід терморезистор
+  pinMode(TH1, INPUT);pinMode(TH2, INPUT);pinMode(TH3, INPUT);
+  digitalWrite(LED_GREEN, LOW);digitalWrite(LED_RED, LOW);digitalWrite(LED_BLUE, HIGH);
+  digitalWrite(R1, LOW);digitalWrite(R2, LOW);
+  digitalWrite(R3, LOW);digitalWrite(R4, LOW);
+  digitalWrite(R5, LOW);digitalWrite(R6, LOW);digitalWrite(CP, LOW);
+
 
   SCHEDULER.init();
-  init_buttom(&SCHEDULER);
   init_wifi(&SCHEDULER);
+  init_console(&SCHEDULER);
+  init_buttom(&SCHEDULER);
+  
   #ifdef USE_OTA
     init_ota(&SCHEDULER);
   #endif
-
+  
   init_lua(&SCHEDULER);
+  
 }
 
 void loop() {
